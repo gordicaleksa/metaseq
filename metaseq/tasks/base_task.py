@@ -275,6 +275,9 @@ class BaseTask(object):
                 indices, dataset, max_positions, ignore_invalid_inputs
             )
 
+        import numpy as np
+
+        indices = indices.astype(np.int64)
         if batch_by_size:
             # create mini-batches with given size constraints
             batch_sampler = dataset.batch_by_size(

@@ -51,6 +51,7 @@ def main(cfg: DictConfig) -> None:
     utils.import_user_module(cfg.common)
 
     if distributed_utils.is_master(cfg.distributed_training):
+        os.makedirs(cfg["checkpoint"]["save_dir"], exist_ok=True)
         # save a (vaguely human readable) copy of the training config
         OmegaConf.save(
             config=_flatten_config(cfg),

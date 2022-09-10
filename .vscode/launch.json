@@ -1,0 +1,64 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "train script",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--distributed-world-size", "1", 
+                "--save-dir", ".\\test_v0",
+                "--tensorboard-logdir", ".\\test_v0\\tb",
+                "--cluster-env", "azure", "--task", "dummy_lm", "--dict-size", "51196", "--no-save", 
+                "--train-subset", "train", "--ignore-unused-valid-subsets", "--num-workers", "0", 
+                "--num-workers-valid", "1", "--validate-interval-updates", "2000", "--save-interval-updates", "2000",
+                "--no-epoch-checkpoints", "--no-best-checkpoints", "--memory-efficient-fp16", "--fp16-init-scale", "4", 
+                "--no-reshard-after-forward", "--use-sharded-state", "--model-parallel-size", "1", 
+                "--criterion", "cross_entropy", "--tensor-parallel-init-model-on-gpu", 
+                "--full-megatron-init", "--megatron-init-sigma", "0.006", "--activation-fn", "relu",
+                "--arch", "transformer_lm", "--share-decoder-input-output-embed",
+                "--decoder-layers", "12", "--decoder-embed-dim", "768",
+                "--decoder-ffn-embed-dim", "3072", "--decoder-attention-heads", "12", "--decoder-learned-pos",
+                "--no-scale-embedding", "--tokens-per-sample", "128", "--optimizer", "adam", "--adam-betas", "(0.9, 0.95)", 
+                "--adam-eps", "1e-08", "--clip-norm", "1.0", "--clip-norm-type", "l2", "--lr-scheduler", "polynomial_decay", 
+                "--lr", "0.0006", "--end-learning-rate", "5.9999999999999995e-05", "--warmup-updates", "50", 
+                "--total-num-update", "50", "--dropout", "0.1", "--attention-dropout", "0.1", "--no-emb-dropout", 
+                "--weight-decay", "0.1", "--batch-size", "1", "--update-freq", "1", "--max-update", "50", "--seed", "1",
+                "--log-format", "json", "--log-interval", "5", "--required-batch-size-multiple", "1"]
+        },  
+        // "--ddp-backend", "fully_sharded", <- removed from above and got the above by running opt_baselines.py
+        // cross_entropy <- using this one instead of the parallel version
+        // transformer_lm <- using this one instead of the megatron version which expects a distributed system
+        // had to put shorter paths for save-dir and tensorboard-logdir otherwise my OS was complaining
+        // remove "--checkpoint-activations" and "--distribute-checkpointed-activations"
+        {
+            "name": "opt baselines",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--benchmark",
+                "--local",
+                "-n",
+                "1", // num of nodes
+                "-g",
+                "1", // num of gpus
+                "-p",
+                "test_v0",
+                "--model-size",
+                "125m",
+                "--azure", // ultimately want to run it locally but leaving this here otherwise it'll fail
+                "--checkpoints-dir",
+                ".",
+            ]
+        }
+    ]
+}

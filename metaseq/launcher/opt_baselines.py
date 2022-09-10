@@ -94,8 +94,8 @@ def get_grid(args):
     total_gpus = args.num_gpus * args.num_nodes
 
     # TODO: fix training to run with 1 gpu (see Enable sweep scripts to run with a single GPU #176)
-    if args.num_gpus < 2:
-        raise ValueError("Need at least two gpus to run model parallel code")
+    # if args.num_gpus < 2:
+    #     raise ValueError("Need at least two gpus to run model parallel code")
     if total_gpus < size.model_parallel:
         raise ValueError(
             "Total gpus (num_gpus * num_nodes) must be great than model parallel factor"
@@ -347,4 +347,7 @@ def cli_main():
 
 
 if __name__ == "__main__":
+    import getpass
+
+    os.environ["USER"] = getpass.getuser()
     cli_main()
